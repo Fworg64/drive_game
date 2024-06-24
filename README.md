@@ -1,5 +1,7 @@
 # drive_game
 
+<img src="./Screenshot_2024-06-23_20-59-39.png" alt="A small rover faces a rock and a crater." width=50%>
+
 A small ray-tracing driving game. 
 
 ```
