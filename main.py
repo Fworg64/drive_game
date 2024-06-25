@@ -118,7 +118,12 @@ def get_ground_color(gx, gy, cam_x=0, cam_y=0):
                         + sun_vec_y * (gy - crater_y)
          crater_product = crater_product / crater_r
          crater_product = max(0, crater_product)
-         col = (255*crater_product, base_col[1], base_col[2]*crater_product)
+         reflecty_product = sun_vec_x * (crater_x - cam_x) \
+                          + sun_vec_y * (crater_y - cam_y)
+         reflecty_product /= np.sqrt((cam_x - crater_x)**2 + (cam_y - crater_y)**2)
+         reflecty_product = max(0, reflecty_product)
+         col = (255*np.sqrt(crater_product*reflecty_product), 
+                base_col[1], base_col[2]*np.sqrt(reflecty_product*crater_product))
          base_col = col
 
        # Check for rock
