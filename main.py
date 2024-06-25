@@ -49,6 +49,18 @@ print(vanishing_point[0:2])
 
 print(camera_to_ground_tf)
 
+# Get field of view at vanishing point
+
+left_ext = camera_to_ground_tf @ np.float32([0, vanishing_point[1], 1])
+#right_ext = camera_to_ground_tf @ np.float32([SCREEN_W vanishing_point[1], 1])
+fov_2 = np.arctan2(left_ext[1]/left_ext[2], 10000)
+fov_rad = 2.0 * fov_2
+print(f"Field of View: {2.0 * fov_2 * 180 / 3.1415}")
+
+# Sun vector
+sun_angle = -0.5 # rad CCW
+sun_vec_x = np.cos(sun_angle)
+sun_vec_y = np.sin(sun_angle)
 
 crater_x = 7
 crater_y = 3
@@ -98,11 +110,6 @@ def get_ground_color(gx, gy, cam_x=0, cam_y=0):
        base_col = (0, 0, 255- 255 * dist/100.0)
        if dist > 10 and dist < 12:
            base_col = (0,255,0)
-          
-       # Sun vector
-       sun_angle = -0.5 # rad CCW
-       sun_vec_x = np.cos(sun_angle)
-       sun_vec_y = np.sin(sun_angle)
        
        # Check for crater
        crater_dist = np.sqrt((gx - crater_x)**2 + (gy - crater_y)**2)
@@ -187,6 +194,13 @@ while running:
         # Calculate absolute ground coordinates
 
         # Pick color from recorded ground texture
+        pygame.gfxdraw.pixel(screen, px, py, col)
+    for py in range(0, int(vanishing_point[1])):
+        point_ang = fov_rad * (px - SCREEN_W/2.0)/SCREEN_W - camera_th
+        sun_product = (-sun_vec_x * np.cos(point_ang) + sun_vec_y * np.sin(point_ang) + 1) / 2.0
+        sun_product = sun_product * sun_product * sun_product * sun_product
+        sun_product *= 1.0 - ((py - int(vanishing_point[1])/2.0) / (int(vanishing_point[1])/2.0))**2
+        col = (200*sun_product, 230*sun_product, 255*sun_product)
         pygame.gfxdraw.pixel(screen, px, py, col)
         
   # Plot calibration target points (rasterized)
